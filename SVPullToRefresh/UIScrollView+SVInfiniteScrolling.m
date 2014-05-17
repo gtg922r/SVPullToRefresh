@@ -228,11 +228,20 @@ UIEdgeInsets scrollViewOriginalContentInsets;
     if(!viewPlaceholder)
         viewPlaceholder = @"";
     
-    if(state == SVInfiniteScrollingStateAll)
+    if(state == SVInfiniteScrollingStateAll) {
+        for(id otherView in self.viewForState) {
+            if([otherView isKindOfClass:[UIView class]]) {
+                [otherView removeFromSuperview];
+            }
+        }
         [self.viewForState replaceObjectsInRange:NSMakeRange(0, 3) withObjectsFromArray:@[viewPlaceholder, viewPlaceholder, viewPlaceholder]];
-    else
+    } else {
+        id otherView = [self.viewForState objectAtIndex:state];
+        if([otherView isKindOfClass:[UIView class]]) {
+            [otherView removeFromSuperview];
+        }
         [self.viewForState replaceObjectAtIndex:state withObject:viewPlaceholder];
-    
+    }
     self.state = self.state;
 }
 
@@ -276,6 +285,10 @@ UIEdgeInsets scrollViewOriginalContentInsets;
         CGRect viewBounds = [customView bounds];
         CGPoint origin = CGPointMake(roundf((self.bounds.size.width-viewBounds.size.width)/2), roundf((self.bounds.size.height-viewBounds.size.height)/2));
         [customView setFrame:CGRectMake(origin.x, origin.y, viewBounds.size.width, viewBounds.size.height)];
+        
+        if (newState == SVInfiniteScrollingStateStopped) {
+            [self.activityIndicatorView stopAnimating];
+        }
     }
     else {
         CGRect viewBounds = [self.activityIndicatorView bounds];
